@@ -17,7 +17,7 @@ def train(args):
         config = yaml.safe_load(file)
     token = config['config']['NEPTUNE_API_TOKEN']
     logger = pl.loggers.NeptuneLogger(
-        project='szymkwiatkowski/zpo-project',
+        project='szymkwiatkowski/nc-net',
         api_token=token)
 
     pl.seed_everything(42, workers=True)
