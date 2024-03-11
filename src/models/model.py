@@ -8,7 +8,6 @@ from src.models.controller_models import BaseModels
 
 class ControllerModel(pl.LightningModule):
     def __init__(self,
-                 embedding_size: int,
                  lr: float,
                  lr_patience: int,
                  lr_factor: float,
@@ -21,7 +20,7 @@ class ControllerModel(pl.LightningModule):
         self.lr_factor = lr_factor
         self.lr_patience = lr_patience
         model = getattr(BaseModels, model)
-        self.network = model(embedding_size)
+        self.network = model()
 
         metrics = torchmetrics.MetricCollection([
             torchmetrics.MeanAbsoluteError(),
@@ -75,5 +74,5 @@ class ControllerModel(pl.LightningModule):
         return {
             'optimizer': optimizer,
             'lr_scheduler': scheduler,
-            'monitor': 'val_precision_at_1',
+            'monitor': 'val_MeanAbsoluteError',
         }

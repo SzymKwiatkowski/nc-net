@@ -35,12 +35,13 @@ def train(args):
         lr_factor=0.5,
         model='controller',
     )
+
     model.hparams.update(datamodule.hparams)
 
     model_summary_callback = pl.callbacks.ModelSummary(max_depth=-1)
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(filename='{epoch}-{val_precision_at_1:.5f}', mode='max',
-                                                       monitor='val_precision_at_1', verbose=True, save_last=True)
-    early_stop_callback = pl.callbacks.EarlyStopping(monitor='val_precision_at_1', mode='max', patience=patience)
+    checkpoint_callback = pl.callbacks.ModelCheckpoint(filename='{epoch}-{val_MeanAbsoluteError:.5f}', mode='min',
+                                                       monitor='val_MeanAbsoluteError', verbose=True, save_last=True)
+    early_stop_callback = pl.callbacks.EarlyStopping(monitor='val_MeanAbsoluteError', mode='min', patience=patience)
     lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval='epoch')
 
     trainer = pl.Trainer(
