@@ -1,4 +1,3 @@
-import pickle
 from pathlib import Path
 import argparse
 import os
@@ -20,11 +19,12 @@ def train(args):
     data_dir = str(args.data_dir)
     config = load_config(config_file)
     token = config['config']['NEPTUNE_API_TOKEN']
+    project = config['config']['NEPTUNE_PROJECT']
 
     logger = None
-    if (use_neptune):
+    if use_neptune:
         logger = pl.loggers.NeptuneLogger(
-            project='szymkwiatkowski/nc-net',
+            project=project,
             api_token=token)
 
     else:
@@ -39,11 +39,11 @@ def train(args):
         num_workers=4,
         train_size=0.8
     )
+
     model = ControllerModel(
         lr=2.55e-5,
         lr_patience=5,
-        lr_factor=0.5,
-        model='basic_model',
+        lr_factor=0.5
     )
 
     model.hparams.update(datamodule.hparams)
@@ -56,25 +56,30 @@ def train(args):
 
     trainer = pl.Trainer(
         logger=logger,
-        devices=1,
         callbacks=[model_summary_callback, checkpoint_callback, early_stop_callback, lr_monitor],
         accelerator='cuda',
         max_epochs=max_epochs
     )
 
-    trainer.fit(model=model, datamodule=datamodule)
+    trainer.fit(model=model, train_dataloaders=datamodule.train_dataloader(),
+                val_dataloaders=datamodule.val_dataloader())
     results = trainer.test(model=model, ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
     print(results)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='ProgramName',
         description='What the program does',
         epilog='Text at the bottom of help')
-    parser.add_argument('-c', '--config', action='store', default='../config.yaml')  # Points to root project dir
-    parser.add_argument('-d', '--data_dir', action='store', default='../data')  # Points to root project dir
+    # Points to root project dir
+    parser.add_argument('-c', '--config', action='store', default='../config.yaml')
+    # Points to root project dir
+    parser.add_argument('-d', '--data_dir', action='store', default='../data/sample_data.csv')
+    # Using neptune
     parser.add_argument('-n', '--use_neptune', action='store', default=False)
+    # Max training epochs
     parser.add_argument('-e', '--epochs', action='store', default=50,
                         type=int, help='Specified number of maximum epochs')
     args_parsed = parser.parse_args()

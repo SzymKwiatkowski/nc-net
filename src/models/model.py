@@ -1,7 +1,7 @@
 import torch.linalg
 from lightning import pytorch as pl
-from pytorch_metric_learning import miners, losses, distances, reducers, regularizers
 import torchmetrics
+from models.controller_model import ControllerNetworkModel
 
 from models.controller_models import BaseModels
 
@@ -10,17 +10,17 @@ class ControllerModel(pl.LightningModule):
     def __init__(self,
                  lr: float,
                  lr_patience: int,
-                 lr_factor: float,
-                 model: str = 'controller'):
+                 lr_factor: float):
         super().__init__()
-
-        self.save_hyperparameters()
 
         self.lr = lr
         self.lr_factor = lr_factor
         self.lr_patience = lr_patience
-        model = getattr(BaseModels, model)
-        self.network = model()
+        # network = getattr(BaseModels, model)
+        self.model = ControllerNetworkModel(
+            1,
+            5
+        )
 
         metrics = torchmetrics.MetricCollection([
             torchmetrics.MeanAbsoluteError(),
@@ -34,7 +34,7 @@ class ControllerModel(pl.LightningModule):
         self.save_hyperparameters()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.network(x)
+        return self.model(x)
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
@@ -69,7 +69,8 @@ class ControllerModel(pl.LightningModule):
         self.log_dict(self.test_metrics)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.9999), lr=self.lr, weight_decay=0.1, amsgrad=True)
+        optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.9999),
+                                      lr=self.lr, weight_decay=0.1, amsgrad=False)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.lr_patience,
                                                                factor=self.lr_factor)
 

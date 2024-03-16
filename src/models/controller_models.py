@@ -1,6 +1,6 @@
 from torch import nn
 
-import models.controller_model
+from models.controller_model import ControllerNetworkModel
 
 
 class BaseModels(object):
@@ -9,7 +9,6 @@ class BaseModels(object):
 
     @staticmethod
     def basic_model(
-            act=nn.ELU,
             filter_sz=5,
             num_filters=24,
             num_dense_neurons=512,
@@ -20,12 +19,11 @@ class BaseModels(object):
             to create a model that builds on top of the embedding_layer.
             """
 
-        return models.controller_model.ControllerModel(
+        return ControllerNetworkModel(
             in_channels=1,
             num_filters=num_filters,
             num_dense_neurons=num_dense_neurons,
             filter_sz=filter_sz,
-            act=act,
             num_classes=num_classes,
         )
 

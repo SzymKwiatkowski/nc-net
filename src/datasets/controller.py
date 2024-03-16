@@ -17,7 +17,13 @@ class ControllerDataset(Dataset):
                                 'acceleration',
                                 'speed',
                                 'jerk']
-        self._feature_columns = list(set(self._target_columns).difference(set(df.columns)))
+        self._feature_columns = list(set(df.columns).difference(set(self._target_columns)))
 
-    def __getitem__(self, _: int) -> tuple[torch.Tensor, torch.Tensor]:
-        return self._df[self._feature_columns], self._df[self._target_columns]
+    def __len__(self):
+        return len(self._df)
+
+    def __getitem__(self, row: int) -> tuple[torch.Tensor, torch.Tensor]:
+        x = torch.from_numpy(self._df[self._feature_columns].iloc[row].to_numpy())
+        y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
+        x = x.unsqueeze(dim=0)
+        return x, y

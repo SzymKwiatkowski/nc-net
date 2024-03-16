@@ -27,10 +27,7 @@ class ControllerDataModule(pl.LightningDataModule):
         self.test_dataset = None
         self.val_dataset = None
 
-        self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
-
-    def setup(self, stage: Optional[str] = None):
-        df = pd.read_csv(self._data_path / 'sample_data.csv')
+        df = pd.read_csv(self._data_path)
         train_df, val_df, test_df = DatasetSplits.basic_split(df, self._train_size)
 
         self.train_dataset = ControllerDataset(
@@ -44,6 +41,11 @@ class ControllerDataModule(pl.LightningDataModule):
         self.test_dataset = ControllerDataset(
             test_df
         )
+
+        self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
+
+    def setup(self, stage: Optional[str] = None):
+        pass
 
     def train_dataloader(self):
         return DataLoader(
