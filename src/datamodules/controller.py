@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
+import pandas as pd
 from lightning import pytorch as pl
 from torch.utils.data import DataLoader
 
@@ -22,33 +23,39 @@ class ControllerDataModule(pl.LightningDataModule):
         self._num_workers = num_workers
         self._train_size = train_size
 
+        self.train_dataset = None
+        self.test_dataset = None
+        self.val_dataset = None
+
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
 
     def setup(self, stage: Optional[str] = None):
-        train_places_dirs, val_places_dirs = DatasetSplits.basic_split(train_places_dirs, self._train_size)
-
-        print(f'Number of train places: {len(train_places_dirs)}')
-        print(f'Number of val places: {len(val_places_dirs)}')
+        df = pd.read_csv(self._data_path / 'example')
+        train_df, val_df = DatasetSplits.basic_split(df, self._train_size)
 
         self.train_dataset = ControllerDataset(
             self._data_path / 'train.csv'
         )
 
-        self.predict_dataset = ControllerDataset(
+        self.train_dataset = ControllerDataset(
+            self._data_path / 'train.csv'
+        )
+
+        self.test_dataset = ControllerDataset(
             self._data_path / 'test.csv'
         )
 
     def train_dataloader(self):
         return DataLoader(
-            self.train_dataset, batch_size=1, num_workers=self._number_of_workers,
+            self.train_dataset, batch_size=self._batch_size, num_workers=self._num_workers,
         )
 
     def val_dataloader(self):
         return DataLoader(
-            self.val_dataset, batch_size=self._validation_batch_size, num_workers=self._number_of_workers,
+            self.val_dataset, batch_size=self._batch_size, num_workers=self._num_workers,
         )
 
-    def predict_dataloader(self):
+    def test_dataloader(self):
         return DataLoader(
-            self.predict_dataset, batch_size=self._validation_batch_size, num_workers=self._number_of_workers,
+            self.test_dataset, batch_size=self._batch_size, num_workers=self._num_workers,
         )

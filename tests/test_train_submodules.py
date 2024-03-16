@@ -1,7 +1,8 @@
 import unittest
 import doctest
+from pathlib import Path
 
-from train import *
+from train import load_config
 
 def setUpModule():
     pass
@@ -53,5 +54,3 @@ class TestName(unittest.TestCase):
 if __name__.__contains__("__main__"):
     print(__doc__)
     unittest.main()
-    # Run just 1 test.
-    # unittest.main(defaultTest='TestFoo.test_foo', warnings='ignore')

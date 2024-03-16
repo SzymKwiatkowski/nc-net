@@ -1,30 +1,33 @@
 import pickle
 from pathlib import Path
 import argparse
-import yaml
 import os
 
 import lightning.pytorch as pl
+from lightning.pytorch.loggers import NeptuneLogger, TensorBoardLogger
 
 from datamodules.controller import ControllerDataModule
 from models.model import ControllerModel
-
-
-def load_config(path: Path) -> dict:
-    with open(path, 'r') as file:
-        config = yaml.safe_load(file)
-    return config
+from utils.helpers import load_config
 
 
 def train(args):
+    # Overrides used graphic card
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     config_file = args.config
     max_epochs = args.epochs
+    use_neptune = args.use_neptune
     config = load_config(config_file)
     token = config['config']['NEPTUNE_API_TOKEN']
-    logger = pl.loggers.NeptuneLogger(
-        project='szymkwiatkowski/nc-net',
-        api_token=token)
+
+    logger = None
+    if (use_neptune):
+        logger = pl.loggers.NeptuneLogger(
+            project='szymkwiatkowski/nc-net',
+            api_token=token)
+
+    else:
+        logger = TensorBoardLogger(save_dir="logs/")
 
     pl.seed_everything(42, workers=True)
     patience = 25
@@ -39,7 +42,7 @@ def train(args):
         lr=2.55e-5,
         lr_patience=5,
         lr_factor=0.5,
-        model='controller',
+        model='basic_model',
     )
 
     model.hparams.update(datamodule.hparams)
@@ -60,24 +63,19 @@ def train(args):
     )
 
     trainer.fit(model=model, datamodule=datamodule)
-    predictions = trainer.predict(model=model, ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
+    results = trainer.test(model=model, ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
-    results = {}
-    for prediction in predictions:
-        for embedding, identifier in zip(*prediction):
-            results[identifier] = embedding.tolist()
-
-    with open('results.pickle', 'wb') as file:
-        pickle.dump(results, file)
-
+    print(results)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='ProgramName',
         description='What the program does',
         epilog='Text at the bottom of help')
-    parser.add_argument('-c', '--config', action='store', default='config.yaml')
+    parser.add_argument('-c', '--config', action='store', default='../config.yaml')  # Points to root project dir
+    parser.add_argument('-d', '--data_dir', action='store', default='../data')  # Points to root project dir
+    parser.add_argument('-n', '--use_neptune', action='store', default=False)
     parser.add_argument('-e', '--epochs', action='store', default=50,
                         type=int, help='Specified number of maximum epochs')
-    args = parser.parse_args()
-    train(args)
+    args_parsed = parser.parse_args()
+    train(args_parsed)

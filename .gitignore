@@ -6,8 +6,8 @@ __pycache__/
 # Config
 config.yaml
 
-# Results 
-results.pickle
+# Tensorboard
+logs/
 
 # dataset
 data/
