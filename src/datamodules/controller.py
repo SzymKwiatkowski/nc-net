@@ -30,19 +30,19 @@ class ControllerDataModule(pl.LightningDataModule):
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
 
     def setup(self, stage: Optional[str] = None):
-        df = pd.read_csv(self._data_path / 'example')
-        train_df, val_df = DatasetSplits.basic_split(df, self._train_size)
+        df = pd.read_csv(self._data_path / 'sample_data.csv')
+        train_df, val_df, test_df = DatasetSplits.basic_split(df, self._train_size)
 
         self.train_dataset = ControllerDataset(
-            self._data_path / 'train.csv'
+            train_df
         )
 
         self.train_dataset = ControllerDataset(
-            self._data_path / 'train.csv'
+            val_df
         )
 
         self.test_dataset = ControllerDataset(
-            self._data_path / 'test.csv'
+            test_df
         )
 
     def train_dataloader(self):

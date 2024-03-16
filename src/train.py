@@ -17,6 +17,7 @@ def train(args):
     config_file = args.config
     max_epochs = args.epochs
     use_neptune = args.use_neptune
+    data_dir = str(args.data_dir)
     config = load_config(config_file)
     token = config['config']['NEPTUNE_API_TOKEN']
 
@@ -33,7 +34,7 @@ def train(args):
     patience = 25
 
     datamodule = ControllerDataModule(
-        data_path=Path('data'),
+        data_path=Path(data_dir),
         batch_size=32,
         num_workers=4,
         train_size=0.8
@@ -58,7 +59,6 @@ def train(args):
         devices=1,
         callbacks=[model_summary_callback, checkpoint_callback, early_stop_callback, lr_monitor],
         accelerator='cuda',
-        strategy="ddp",
         max_epochs=max_epochs
     )
 

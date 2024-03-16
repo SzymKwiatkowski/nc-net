@@ -37,11 +37,13 @@ class ControllerModel(pl.LightningModule):
         return self.network(x)
 
     def training_step(self, batch, batch_idx):
-        x, y = batch
-        x = x.squeeze(0)
-        y = y.squeeze(0)
-        y_pred = self.forward(x)
-        loss = self.loss_function(y_pred, y, self.miner(y_pred, y))
+        inputs, labels = batch
+        outputs = self(inputs)
+
+        loss = self.loss_function(outputs, labels)
+
+        self.test_metrics.update(outputs, labels)
+
         self.log('train_loss', loss, sync_dist=True, prog_bar=True)
         self.log_dict(self.train_metrics)
         return loss
