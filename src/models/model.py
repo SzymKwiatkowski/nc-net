@@ -3,7 +3,7 @@ from lightning import pytorch as pl
 from pytorch_metric_learning import miners, losses, distances, reducers, regularizers
 import torchmetrics
 
-from src.models.controller_models import BaseModels
+from models.controller_models import BaseModels
 
 
 class ControllerModel(pl.LightningModule):

@@ -6,15 +6,21 @@ import os
 
 import lightning.pytorch as pl
 
-from src.datamodules.controller import ControllerDataModule
-from src.models.model import ControllerModel
+from datamodules.controller import ControllerDataModule
+from models.model import ControllerModel
+
+
+def load_config(path: Path) -> dict:
+    with open(path, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
+
 
 def train(args):
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     config_file = args.config
     max_epochs = args.epochs
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)
+    config = load_config(config_file)
     token = config['config']['NEPTUNE_API_TOKEN']
     logger = pl.loggers.NeptuneLogger(
         project='szymkwiatkowski/nc-net',

@@ -4,8 +4,8 @@ from typing import Optional
 from lightning import pytorch as pl
 from torch.utils.data import DataLoader
 
-from src.datamodules.dataset_split import DatasetSplits
-from src.datasets.controller import ControllerDataset
+from datamodules.dataset_split import DatasetSplits
+from datasets.controller import ControllerDataset
 
 
 class ControllerDataModule(pl.LightningDataModule):
