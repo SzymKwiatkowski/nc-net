@@ -78,7 +78,7 @@ class NgramDataModule(pl.LightningDataModule):
             train_df,Context,len(ColumnsPresets)
         )
 
-        self.train_dataset = NgramDataset(
+        self.val_dataset = NgramDataset(
             val_df,Context,len(ColumnsPresets)
         )
 

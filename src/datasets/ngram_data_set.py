@@ -17,12 +17,12 @@ class NgramDataset(Dataset):
         #print(len(self._df))
         self.NumOfValuesPerWord=NumOfValuesPerWord
     def __len__(self):
-        print("test")
+        #print("test")
         return len(self._df)
 
     def __getitem__(self, row: int) -> tuple[torch.Tensor, torch.Tensor]:
-        print("test2")
-        x = torch.from_numpy(self._df[0:self.NumOfValuesPerWord*self.Contex].iloc[row].to_numpy())
+        #print(self._df[0:self.NumOfValuesPerWord*self.Context])
+        x = torch.from_numpy(self._df[0:self.NumOfValuesPerWord*self.Context].iloc[row].to_numpy())
         y = torch.from_numpy(self._df[-self.NumOfValuesPerWord:].iloc[row].to_numpy())
         print(x)
         return x,y
