@@ -4,8 +4,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 import pandas as pd
-from src.utils.pandas_helpers import PandasHelpers
-from src.utils.resource_manager import ResourceManager
+from utils.pandas_helpers import PandasHelpers
+from utils.resource_manager import ResourceManager
 
 
 class ControllerDataset(Dataset):
