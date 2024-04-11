@@ -34,7 +34,7 @@ class ControllerDataModule(pl.LightningDataModule):
             train_df
         )
 
-        self.train_dataset = ControllerDataset(
+        self.val_dataset = ControllerDataset(
             val_df
         )
 

@@ -15,7 +15,7 @@ class NgramDataModule(pl.LightningDataModule):
             batch_size: int = 32,
             num_workers: int = 4,
             train_size: float = 0.8,
-            Context: int=2):
+            context: int = 2):
         super().__init__()
 
         self._data_path = Path(data_path)
@@ -51,8 +51,8 @@ class NgramDataModule(pl.LightningDataModule):
         columns=[]
         sufixes=[]
         #print(df.columns)
-        for i in range(Context):
-            sufixes.append("N-"+str(Context-i))
+        for i in range(context):
+            sufixes.append("N-"+str(context-i))
         sufixes.reverse()
         sufixes.append("N")
         #print(sufixes)
@@ -64,7 +64,7 @@ class NgramDataModule(pl.LightningDataModule):
         for i in range(len(df.index)):
             for j in range(6):
                 newrow=np.array([])
-                for k in range(Context+1):
+                for k in range(context+1):
                     low=j*len(ColumnsPresets)+len(ColumnsPresets)*k
                     high=j*len(ColumnsPresets)+len(ColumnsPresets)*(k+1)
                     #print(len(df.iloc[i][low:high]))
@@ -72,18 +72,26 @@ class NgramDataModule(pl.LightningDataModule):
                 data=data.append(pd.DataFrame(newrow.reshape(1,-1), columns=list(data)), ignore_index=False)
 #        print(data)
         train_df, val_df, test_df = DatasetSplits.basic_split(data, self._train_size)
+
         print(len(train_df))
         print(len(test_df))
+
         self.train_dataset = NgramDataset(
-            train_df,Context,len(ColumnsPresets)
+            train_df,
+            context,
+            len(ColumnsPresets)
         )
 
         self.val_dataset = NgramDataset(
-            val_df,Context,len(ColumnsPresets)
+            val_df,
+            context,
+            len(ColumnsPresets)
         )
 
         self.test_dataset = NgramDataset(
-            test_df,Context,len(ColumnsPresets)
+            test_df,
+            context,
+            len(ColumnsPresets)
         )
 
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])

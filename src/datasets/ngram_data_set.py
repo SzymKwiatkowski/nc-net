@@ -9,20 +9,20 @@ import pandas as pd
 class NgramDataset(Dataset):
     def __init__(self,
                  df: pd.DataFrame,
-                 Context: int,
-                 NumOfValuesPerWord: int):
+                 context: int,
+                 num_of_values_per_word: int):
         super().__init__()
-        self.Context=Context
+        self.Context = context
         self._df = df
-        #print(len(self._df))
-        self.NumOfValuesPerWord=NumOfValuesPerWord
+        self.NumOfValuesPerWord = num_of_values_per_word
+
     def __len__(self):
-        #print("test")
+        print("test")
         return len(self._df)
 
     def __getitem__(self, row: int) -> tuple[torch.Tensor, torch.Tensor]:
-        #print(self._df[0:self.NumOfValuesPerWord*self.Context])
+        print("test2")
         x = torch.from_numpy(self._df[0:self.NumOfValuesPerWord*self.Context].iloc[row].to_numpy())
-        y = torch.from_numpy(self._df[-self.NumOfValuesPerWord:].iloc[row].to_numpy())
+        y = torch.from_numpy(self._df[:-self.NumOfValuesPerWord].iloc[row].to_numpy())
         print(x)
         return x,y

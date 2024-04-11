@@ -6,7 +6,9 @@ import lightning.pytorch as pl
 from lightning.pytorch.loggers import NeptuneLogger, TensorBoardLogger
 
 from datamodules.controller import ControllerDataModule
+from datamodules.ngram_data_module import NgramDataModule
 from models.model import ControllerModel
+from models.ngram_lightning_module import NGramLightningModule
 from utils.helpers import load_config
 
 
@@ -33,14 +35,14 @@ def train(args):
     pl.seed_everything(42, workers=True)
     patience = 25
 
-    datamodule = ControllerDataModule(
+    datamodule = NgramDataModule(
         data_path=Path(data_dir),
         batch_size=32,
         num_workers=4,
         train_size=0.8
     )
 
-    model = ControllerModel(
+    model = NGramLightningModule(
         lr=2.55e-5,
         lr_patience=5,
         lr_factor=0.5
