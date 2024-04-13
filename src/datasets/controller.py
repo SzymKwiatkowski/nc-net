@@ -51,8 +51,9 @@ class ControllerDataset(Dataset):
         x = torch.from_numpy(x)
         y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
         x = x.unsqueeze(dim=0)
+        y = y.unsqueeze(dim=0)
 
-        return x, y
+        return x.float(), y.float()
 
     def extract_points_data(self, row: int, start_idx: int) -> np.ndarray:
         """

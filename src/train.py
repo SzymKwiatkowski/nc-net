@@ -24,6 +24,7 @@ def train(args):
     config = load_config(config_file)
     token = config['config']['NEPTUNE_API_TOKEN']
     project = config['config']['NEPTUNE_PROJECT']
+    num_dense_neurons = 512
 
     logger = None
     if use_neptune:
@@ -49,13 +50,15 @@ def train(args):
     model = ControllerModel(
         lr=2.55e-5,
         lr_patience=5,
-        lr_factor=0.5
+        lr_factor=0.5,
+        extraction_points_count=extraction_points_count,
+        num_dense_neurons=num_dense_neurons
     )
 
     model.hparams.update(datamodule.hparams)
 
     model_summary_callback = pl.callbacks.ModelSummary(max_depth=-1)
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(filename='{epoch}-{val_MeanAbsoluteError:.5f}', mode='min',
+    checkpoint_callback = pl.callbacks.ModelCheckpoint(filename='points-{extraction_points_count}-{epoch}-{val_MeanAbsoluteError:.5f}', mode='min',
                                                        monitor='val_MeanAbsoluteError', verbose=True, save_last=True)
     early_stop_callback = pl.callbacks.EarlyStopping(monitor='val_MeanAbsoluteError', mode='min', patience=patience)
     lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval='epoch')
