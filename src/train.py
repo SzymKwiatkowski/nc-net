@@ -35,14 +35,14 @@ def train(args):
     pl.seed_everything(42, workers=True)
     patience = 25
 
-    datamodule = NgramDataModule(
+    datamodule = ControllerDataModule(
         data_path=Path(data_dir),
         batch_size=32,
         num_workers=4,
         train_size=0.8
     )
 
-    model = NGramLightningModule(
+    model = ControllerModel(
         lr=2.55e-5,
         lr_patience=5,
         lr_factor=0.5

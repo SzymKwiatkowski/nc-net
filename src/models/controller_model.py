@@ -35,15 +35,15 @@ class ControllerNetworkModel(nn.Module):
         self._linOut = nn.Linear(self._num_dense_neurons // 2, self._num_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self._conv_1(x)
+        x = self._conv1(x)
         x = self._activation(x)
         x = self._max_pool(x)
 
-        x = self._conv2_(x)
+        x = self._conv2(x)
         x = self._activation(x)
         x = self._max_pool(x)
 
-        x = self._conv3_(x)
+        x = self._conv3(x)
         x = self._activation(x)
         x = self._max_pool(x)
 
