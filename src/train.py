@@ -18,6 +18,8 @@ def train(args):
     config_file = args.config
     max_epochs = args.epochs
     use_neptune = args.use_neptune
+    points_count = args.points_count
+    extraction_points_count = args.extraction_points_count
     data_dir = str(args.data_dir)
     config = load_config(config_file)
     token = config['config']['NEPTUNE_API_TOKEN']
@@ -39,7 +41,9 @@ def train(args):
         data_path=Path(data_dir),
         batch_size=32,
         num_workers=4,
-        train_size=0.8
+        train_size=0.8,
+        points_count=points_count,
+        extraction_points_count=extraction_points_count,
     )
 
     model = ControllerModel(
@@ -84,5 +88,11 @@ if __name__ == '__main__':
     # Max training epochs
     parser.add_argument('-e', '--epochs', action='store', default=50,
                         type=int, help='Specified number of maximum epochs')
+    # Amount of points desired to be used
+    parser.add_argument('-p', '--points_count', action='store', default=271,
+                        type=int, help='Specified count of points from trajectory')
+    parser.add_argument('-ep', '--extraction-points-count', action='store', default=20,
+                        type=int, help='Specified count of points from trajectory to be used')
+
     args_parsed = parser.parse_args()
     train(args_parsed)

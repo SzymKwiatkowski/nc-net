@@ -15,13 +15,17 @@ class ControllerDataModule(pl.LightningDataModule):
             data_path: Path,
             batch_size: int = 32,
             num_workers: int = 4,
-            train_size: float = 0.8):
+            train_size: float = 0.8,
+            points_count: int = 271,
+            extraction_points_count: int = 20):
         super().__init__()
 
         self._data_path = Path(data_path)
         self._batch_size = batch_size
         self._num_workers = num_workers
         self._train_size = train_size
+        self._points_count = points_count
+        self._extraction_points_count = extraction_points_count
 
         self.train_dataset = None
         self.test_dataset = None
@@ -31,15 +35,21 @@ class ControllerDataModule(pl.LightningDataModule):
         train_df, val_df, test_df = DatasetSplits.basic_split(df, self._train_size)
 
         self.train_dataset = ControllerDataset(
-            train_df
+            train_df,
+            self._points_count,
+            self._extraction_points_count
         )
 
         self.val_dataset = ControllerDataset(
-            val_df
+            val_df,
+            self._points_count,
+            self._extraction_points_count
         )
 
         self.test_dataset = ControllerDataset(
-            test_df
+            test_df,
+            self._points_count,
+            self._extraction_points_count
         )
 
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
