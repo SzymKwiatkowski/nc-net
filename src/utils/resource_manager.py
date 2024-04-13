@@ -5,6 +5,10 @@ class ResourceManager:
         return ["point_(\d*)_pos\w*", "point_(\d*)_orientation\w*", "point_(\d*)_longitudinal_velocity\w*"]
 
     @staticmethod
+    def get_regex_point_position_patterns() -> list[str]:
+        return ["point_(\d*)_pos\w*", "point_(\d*)_orientation_\w*"]
+
+    @staticmethod
     def get_targets_column_names() -> list[str]:
         return ['steering_tire_angle',
                 'steering_tire_rotation_rate',

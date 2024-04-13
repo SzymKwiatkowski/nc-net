@@ -4,6 +4,7 @@ import yaml
 from pathlib import Path
 from utils.helpers import load_config
 
+
 def check(args):
     config_file = args.config
     config = load_config(Path(config_file))
