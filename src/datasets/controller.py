@@ -38,8 +38,9 @@ class ControllerDataset(Dataset):
 
     def __getitem__(self, row: int) -> tuple[torch.Tensor, torch.Tensor]:
         point_poses = np.array(self._df.iloc[row][self._point_pos_cols].to_numpy())
+        point_cols_count = len(point_poses) // self._points_count
         position = np.array([self._df.iloc[row][self._pos_columns].to_numpy()])
-        point_poses = point_poses.reshape((len(point_poses) // 7, 7))
+        point_poses = point_poses.reshape((len(point_poses) // point_cols_count, point_cols_count))
 
         idx = self.get_closest_points_idx(position, point_poses)
         extracted_points = self.extract_points_data(row, idx)
