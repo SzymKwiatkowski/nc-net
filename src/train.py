@@ -48,7 +48,7 @@ def train(args):
     )
 
     model = ControllerModel(
-        lr=2.55e-5,
+        lr=2.5e-5,
         lr_patience=5,
         lr_factor=0.5,
         extraction_points_count=extraction_points_count,
