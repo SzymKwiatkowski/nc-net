@@ -11,7 +11,8 @@ class ControllerModel(pl.LightningModule):
                  lr: float,
                  lr_patience: int,
                  lr_factor: float,
-                 extraction_points_count: int,
+                 input_size: int,
+                 output_size: int,
                  num_dense_neurons: int):
         super().__init__()
 
@@ -19,12 +20,10 @@ class ControllerModel(pl.LightningModule):
         self.lr_factor = lr_factor
         self.lr_patience = lr_patience
         self.loss_function = torch.nn.MSELoss()
-        # network = getattr(BaseModels, model)
 
-        input_size = (extraction_points_count + 1) * 8
         self.model = ControllerNetworkModel(
             input_size=input_size,
-            output_size=5,
+            output_size=output_size,
             num_dense_neurons=num_dense_neurons
         )
 

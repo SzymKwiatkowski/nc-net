@@ -2,7 +2,7 @@
 class ResourceManager:
     @staticmethod
     def get_regex_point_patterns() -> list[str]:
-        return ["point_(\d*)_pos\w*", "point_(\d*)_orientation\w*", "point_(\d*)_longitudinal_velocity\w*"]
+        return ["point_(\d*)_pos\w*", "point_(\d*)_orientation\w*"]
 
     @staticmethod
     def get_regex_point_position_patterns() -> list[str]:
