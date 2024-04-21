@@ -14,6 +14,17 @@ class ResourceManager:
         ]
 
     @staticmethod
+    def get_regex_point_position_patterns_for_all_cols() -> list[str]:
+        """
+        :return: list of regex point patterns for point extraction of
+        """
+        return [
+            r"point_(\d*)_pos\w*",
+            r"point_(\d*)_orientation_\w*",
+            r"point_(\d*)_longitudinal_\w*"
+        ]
+
+    @staticmethod
     def get_targets_column_names() -> list[str]:
         """
         :return: list of target column names
