@@ -3,8 +3,6 @@ from lightning import pytorch as pl
 import torchmetrics
 from models.controller_model import ControllerNetworkModel
 
-from models.controller_models import BaseModels
-
 
 class ControllerModel(pl.LightningModule):
     def __init__(self,
