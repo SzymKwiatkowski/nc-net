@@ -1,5 +1,4 @@
 """Unit tests for train submodules"""
-
 import unittest
 import doctest
 from pathlib import Path

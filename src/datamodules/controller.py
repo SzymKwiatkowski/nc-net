@@ -34,23 +34,27 @@ class ControllerDataModule(pl.LightningDataModule):
         self.test_dataset = None
         self.val_dataset = None
 
-        df = pd.read_csv(self._data_path)
+        df = pd.read_csv(self._data_path / "main_df.csv")
+        race_track_df = pd.read_csv(self._data_path / "points_df.csv")
         train_df, val_df, test_df = basic_split(df, self._train_size)
 
         self.train_dataset = ControllerDataset(
             train_df,
+            race_track_df,
             self._points_count,
             self._extraction_points_count
         )
 
         self.val_dataset = ControllerDataset(
             val_df,
+            race_track_df,
             self._points_count,
             self._extraction_points_count
         )
 
         self.test_dataset = ControllerDataset(
             test_df,
+            race_track_df,
             self._points_count,
             self._extraction_points_count
         )

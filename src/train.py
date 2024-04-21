@@ -94,7 +94,7 @@ if __name__ == '__main__':
     # Points to root project dir
     parser.add_argument('-c', '--config', action='store', default='../config.yaml')
     # Points to root project dir
-    parser.add_argument('-d', '--data_dir', action='store', default='../data/sample_data.csv')
+    parser.add_argument('-d', '--data_dir', action='store', default='../data')
     # Using neptune
     parser.add_argument('-n', '--use_neptune', action='store', default=False)
     # Max training epochs
