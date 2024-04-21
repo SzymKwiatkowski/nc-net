@@ -51,7 +51,8 @@ def train(args):
         lr=2.5e-5,
         lr_patience=5,
         lr_factor=0.5,
-        extraction_points_count=extraction_points_count,
+        input_size=datamodule.n_features,
+        output_size=datamodule.n_targets,
         num_dense_neurons=num_dense_neurons
     )
 

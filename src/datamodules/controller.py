@@ -52,6 +52,8 @@ class ControllerDataModule(pl.LightningDataModule):
             self._extraction_points_count
         )
 
+        self.n_features = self.train_dataset.n_features
+        self.n_targets = self.train_dataset.n_targets
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
 
     def setup(self, stage: Optional[str] = None):

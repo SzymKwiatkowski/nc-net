@@ -32,6 +32,9 @@ class ControllerDataset(Dataset):
 
         columns_to_drop = list(set(df.columns).difference(set(all_columns)))
         self._df.drop(inplace=True, columns=columns_to_drop, axis=1)
+        point_cols_count = len(self._point_pos_cols) // self._points_count
+        self.n_features = self._extraction_points_count * point_cols_count + len(self._pos_columns)
+        self.n_targets = len(self._target_columns)
 
     def __len__(self):
         return len(self._df)
@@ -45,8 +48,7 @@ class ControllerDataset(Dataset):
         idx = self.get_closest_points_idx(position, point_poses)
         extracted_points = self.extract_points_data(row, idx)
 
-        # TODO: fill with current velocity instead of zero
-        x = np.concatenate([np.array([0]), position.T.flatten(), extracted_points])
+        x = np.concatenate([position.T.flatten(), extracted_points])
 
         x = torch.from_numpy(x)
         y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
