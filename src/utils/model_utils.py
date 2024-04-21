@@ -29,11 +29,11 @@ def sparsity(model):
     return b / a
 
 
-def measure_latency(model, dtype=torch.float32, iterations: int = 10000) -> float:
+def measure_latency(model, input_size: int, dtype=torch.float32, iterations: int = 10000) -> float:
     infer_times = []
 
     for __ in range(iterations):
-        input_data = torch.randn(1, 3, 320, 320, dtype=dtype, device=model.device)
+        input_data = torch.randn(1, 1, input_size, dtype=dtype, device=model.device)
         inference_start = perf_counter()
         __ = model(input_data)
         inference_time = perf_counter() - inference_start
