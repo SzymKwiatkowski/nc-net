@@ -1,0 +1,8 @@
+#!/bin/bash
+
+pip3 install lightning
+pip3 install neptune
+pip3 install tensorboard
+pip3 install pandas
+pip3 install scikit-learn
+pip3 install onnx

@@ -16,6 +16,7 @@ class ControllerModel(pl.LightningModule):
         self.lr = module_config["lr"]
         self.lr_factor = module_config["lr_factor"]
         self.lr_patience = module_config["lr_patience"]
+        self.extraction_points_count = module_config["extraction_points_count"]
         self.loss_function = torch.nn.MSELoss()
 
         self.model = ControllerNetworkModel(
@@ -72,7 +73,7 @@ class ControllerModel(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.9999),
-                                      lr=self.lr, weight_decay=0.1, amsgrad=False)
+                                      lr=self.lr, weight_decay=0.01, amsgrad=False)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.lr_patience,
                                                                factor=self.lr_factor)
 

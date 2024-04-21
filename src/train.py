@@ -45,7 +45,8 @@ def train(args):
         module_config={
             "lr": 2.5e-5,
             "lr_patience": 5,
-            "lr_factor": 0.5
+            "lr_factor": 0.5,
+            "extraction_points_count": args.extraction_points_count,
         },
         network_config={
             'input_size': datamodule.n_features,
@@ -79,6 +80,7 @@ def train(args):
 
     trainer.fit(model=model, train_dataloaders=datamodule.train_dataloader(),
                 val_dataloaders=datamodule.val_dataloader())
+
     results = trainer.test(model=model, ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
     print(results)
@@ -96,7 +98,7 @@ if __name__ == '__main__':
     # Using neptune
     parser.add_argument('-n', '--use_neptune', action='store', default=False)
     # Max training epochs
-    parser.add_argument('-e', '--epochs', action='store', default=50,
+    parser.add_argument('-e', '--epochs', action='store', default=70,
                         type=int, help='Specified number of maximum epochs')
     # Amount of points desired to be used
     parser.add_argument('-pc', '--points_count', action='store', default=271,
