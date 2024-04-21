@@ -29,9 +29,9 @@ def export_model(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        prog='ProgramName',
-        description='What the program does',
-        epilog='Text at the bottom of help')
+        prog='export',
+        description='Export model in ONNX format',
+        epilog='')
     parser.add_argument('-m', '--model-path', action='store', default='torch_model.pth')
     parser.add_argument('-n', '--export-name', action='store', default='model.onnx')
     parser.add_argument('-d', '--data-path', action='store', default='../data/sample_data.csv')

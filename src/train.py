@@ -80,9 +80,9 @@ def train(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        prog='ProgramName',
-        description='What the program does',
-        epilog='Text at the bottom of help')
+        prog='train',
+        description='train neural controller network',
+        epilog='')
     # Points to root project dir
     parser.add_argument('-c', '--config', action='store', default='../config.yaml')
     # Points to root project dir
