@@ -1,3 +1,4 @@
+"""Module providing utilities to model exporting and assessment"""
 from pathlib import Path
 from time import perf_counter
 
@@ -6,22 +7,28 @@ import torch
 
 
 def get_size(model_file_path: Path) -> str:
-    """ Calculates model file size. """
+    """
+    :param model_file_path: path pointing to exported model
+    :return: size of model
+    """
     model_file_path = Path(model_file_path)
     size = model_file_path.stat().st_size
 
+    size_str = None
+
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if size < 1024.0:
-            return "%3.1f %s" % (size, x)
+            size_str = f"{size:3.1f} {x}"
+            break
         size /= 1024.0
 
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    return "Couldn't specify size!" if size_str is None else size_str
 
 
-def sparsity(model):
-    """ Calculates global model sparsity. """
+def sparsity(model) -> float:
+    """ Calculates global model sparsity. 
+    :rtype: sparsity percentage
+    """
     a, b = 0, 0
     for p in model.parameters():
         a += p.numel()
@@ -30,6 +37,14 @@ def sparsity(model):
 
 
 def measure_latency(model, input_size: int, dtype=torch.float32, iterations: int = 10000) -> float:
+    """
+
+    :param model: pytorch model instance
+    :param input_size: count of input features
+    :param dtype: dtype of input data
+    :param iterations: iterations to measure latency
+    :return: average latency (in ms)
+    """
     infer_times = []
 
     for __ in range(iterations):
@@ -43,6 +58,12 @@ def measure_latency(model, input_size: int, dtype=torch.float32, iterations: int
 
 
 def export_onnx(model, input_size: int, dtype=torch.float32, onnx_model_name: str = 'model.onnx'):
+    """
+    :param model: pytorch model instance
+    :param input_size: count of input features
+    :param dtype: dtype of input data
+    :param onnx_model_name: name of onnx model
+    """
     model.eval()
     input_data = torch.randn(1, 1, input_size, dtype=dtype, device=model.device)
 

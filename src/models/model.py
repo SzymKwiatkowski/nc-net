@@ -1,30 +1,28 @@
+"""Lightning module for controller"""
 import torch.linalg
 from lightning import pytorch as pl
 import torchmetrics
 from models.controller_model import ControllerNetworkModel
 
-from models.controller_models import BaseModels
 
-
+# pylint: disable=W0221, R0902
 class ControllerModel(pl.LightningModule):
+    """Class for lightning module for controller"""
     def __init__(self,
-                 lr: float,
-                 lr_patience: int,
-                 lr_factor: float,
-                 input_size: int,
-                 output_size: int,
-                 num_dense_neurons: int):
+                 module_config: dict,
+                 network_config: dict):
         super().__init__()
 
-        self.lr = lr
-        self.lr_factor = lr_factor
-        self.lr_patience = lr_patience
+        self.lr = module_config["lr"]
+        self.lr_factor = module_config["lr_factor"]
+        self.lr_patience = module_config["lr_patience"]
+        self.extraction_points_count = module_config["extraction_points_count"]
         self.loss_function = torch.nn.MSELoss()
 
         self.model = ControllerNetworkModel(
-            input_size=input_size,
-            output_size=output_size,
-            num_dense_neurons=num_dense_neurons
+            input_size=network_config["input_size"],
+            output_size=network_config["output_size"],
+            num_dense_neurons=network_config["num_dense_neurons"]
         )
 
         metrics = torchmetrics.MetricCollection([
@@ -41,7 +39,7 @@ class ControllerModel(pl.LightningModule):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch, _batch_idx):
         inputs, labels = batch
         outputs = self(inputs)
 
@@ -53,7 +51,7 @@ class ControllerModel(pl.LightningModule):
         self.log_dict(self.train_metrics)
         return loss
 
-    def validation_step(self, batch, batch_idx) -> None:
+    def validation_step(self, batch, _batch_idx) -> None:
         inputs, labels = batch
         outputs = self(inputs)
         loss = self.loss_function(outputs, labels)
@@ -63,7 +61,7 @@ class ControllerModel(pl.LightningModule):
         self.log('val_loss', loss, prog_bar=True)
         self.log_dict(self.val_metrics)
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch, _batch_idx):
         inputs, labels = batch
         outputs = self(inputs)
         loss = self.loss_function(outputs, labels)
@@ -75,7 +73,7 @@ class ControllerModel(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.9999),
-                                      lr=self.lr, weight_decay=0.1, amsgrad=False)
+                                      lr=self.lr, weight_decay=0.01, amsgrad=False)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.lr_patience,
                                                                factor=self.lr_factor)
 

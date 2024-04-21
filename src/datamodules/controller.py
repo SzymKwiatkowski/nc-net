@@ -1,3 +1,4 @@
+"""Datamodule for managing dataset data and workers during training"""
 from pathlib import Path
 from typing import Optional
 
@@ -5,11 +6,13 @@ import pandas as pd
 from lightning import pytorch as pl
 from torch.utils.data import DataLoader
 
-from datamodules.dataset_split import DatasetSplits
+from datamodules.dataset_split import basic_split
 from datasets.controller import ControllerDataset
 
 
+# pylint: disable=R0913, R0902
 class ControllerDataModule(pl.LightningDataModule):
+    """Class for managing dataset data and workers during training"""
     def __init__(
             self,
             data_path: Path,
@@ -32,7 +35,7 @@ class ControllerDataModule(pl.LightningDataModule):
         self.val_dataset = None
 
         df = pd.read_csv(self._data_path)
-        train_df, val_df, test_df = DatasetSplits.basic_split(df, self._train_size)
+        train_df, val_df, test_df = basic_split(df, self._train_size)
 
         self.train_dataset = ControllerDataset(
             train_df,

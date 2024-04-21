@@ -1,5 +1,4 @@
-from pathlib import Path
-
+"""Implementation of dataset for controller network."""
 import numpy as np
 import torch
 from torch.utils.data import Dataset
@@ -8,7 +7,9 @@ from utils.pandas_helpers import PandasHelpers
 from utils.resource_manager import ResourceManager
 
 
+# pylint: disable=R0902
 class ControllerDataset(Dataset):
+    """Class implementing dataset for controller network."""
     def __init__(self,
                  df: pd.DataFrame,
                  points_count: int = 271,
@@ -21,11 +22,9 @@ class ControllerDataset(Dataset):
         self._extraction_points_count = extraction_points_count
         self._points_count = points_count
 
-        columns_selected, columns_to_drop = PandasHelpers.select_columns_with_patter(
-            self._df, ResourceManager.get_regex_point_patterns())
-        point_pos_cols, _ = PandasHelpers.select_columns_with_patter(
+        columns_selected, _ = PandasHelpers.select_columns_with_patter(
             self._df, ResourceManager.get_regex_point_position_patterns())
-        self._point_pos_cols = point_pos_cols
+        self._point_pos_cols = columns_selected
         self._points_training_cols = columns_selected
         self._feature_columns = self._pos_columns + columns_selected
         all_columns = self._feature_columns + self._target_columns
