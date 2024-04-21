@@ -1,14 +1,20 @@
+"""Unit tests for train submodules"""
+
 import unittest
 import doctest
 from pathlib import Path
 
 from train import load_config
 
+
+# pylint: disable=C0103, W0107, W0613, W0221, C2801
 def setUpModule():
+    """Setup tests"""
     pass
 
 
 def tearDownModule():
+    """Clean after tests"""
     pass
 
 
@@ -46,10 +52,12 @@ class TestName(unittest.TestCase):
         pass  # Probably you may not use this one. See tearDown().
 
     def test_config_file(self):
+        """Run test for config file"""
         config_path = Path("templates/config.yaml.template")
         config = load_config(config_path)
         self.assertIsNotNone(config)
-        self.assertEquals(config['config']['NEPTUNE_API_TOKEN'], "f2137b")
+        self.assertEqual(config['config']['NEPTUNE_API_TOKEN'], "f2137b")
+
 
 if __name__.__contains__("__main__"):
     print(__doc__)

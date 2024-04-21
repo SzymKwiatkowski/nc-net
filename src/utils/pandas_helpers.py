@@ -1,8 +1,11 @@
+"""Module providing helpers to processing pandas dataframes."""
+
 import re
 import pandas as pd
 
 
 class PandasHelpers:
+    """Class providing helpers to processing pandas dataframes."""
     @staticmethod
     def select_columns(
             df: pd.DataFrame,
@@ -15,7 +18,7 @@ class PandasHelpers:
         :rtype: tuple[list[str], list[str]]
         """
         cols = list(df.columns)
-        
+
         generate_regex_matches = [pattern.format(index=str(i))
                                   for i in range(points_count)
                                   for pattern in points_pattern]
@@ -24,7 +27,7 @@ class PandasHelpers:
         drop_cols = []
 
         for col in cols:
-            if any([re.match(col, match) for match in generate_regex_matches]):
+            if any(re.match(col, match) for match in generate_regex_matches):
                 match_cols.append(col)
             else:
                 drop_cols.append(col)
@@ -37,7 +40,7 @@ class PandasHelpers:
             patterns: list[str]) -> tuple[list[str], list[str]]:
         """
         :arg df: Pandas dataframe
-        :arg patterns: list of regex pattern strings eg. point_(\d*)_pos\w*
+        :arg patterns: list of regex pattern strings
         :rtype: tuple[list[str], list[str]]
         """
         cols = list(df.columns)

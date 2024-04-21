@@ -1,4 +1,4 @@
-import torch
+"""Script for exporting pytorch models to ONNX format."""
 import argparse
 from pathlib import Path
 import onnx
@@ -7,9 +7,14 @@ from models.model import ControllerModel
 from utils.model_utils import export_onnx, measure_latency, get_size
 
 
-def export_model(args):
+# pylint: disable=E1120
+def export_model(args) -> None:
+    """
+    Export model to ONNX format
+    :rtype: None
+    """
     model_path = Path(args.model_path)
-    torch_model = ControllerModel.load_from_checkpoint(model_path)
+    torch_model = ControllerModel.load_from_checkpoint(checkpoint_path=model_path)
     onnx_export_name = args.export_name
     extraction_points = args.extraction_points_count
     input_size = args.input_size
