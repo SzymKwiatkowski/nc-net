@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model-path', action='store', default='torch_model.pth')
     parser.add_argument('-n', '--export-name', action='store', default='model.onnx')
     parser.add_argument('-d', '--data-path', action='store', default='../data/sample_data.csv')
-    parser.add_argument('-ep', '--extraction-points-count', action='store', default=20,
+    parser.add_argument('-ep', '--extraction-points-count', action='store', default=10,
                         type=int, help='Specified count of points from trajectory to be used')
     parser.add_argument('-ip', '--input-size', action='store', type=int,
                         help='Specified input size if passed to script automatically overrides' +
