@@ -28,7 +28,7 @@ def prepare_dataset(args) -> None:
     pose_cols = ResourceManager.get_position_column_names()
     target_cols = ResourceManager.get_targets_column_names()
     points_selected_cols, _ = PandasHelpers.select_columns_with_patter(
-            df, ResourceManager.get_regex_point_position_patterns_for_all_cols())
+            df, ResourceManager.get_regex_point_position_patterns())
 
     main_df_cols = pose_cols + target_cols
     main_df = df[main_df_cols].copy()
