@@ -20,7 +20,8 @@ class ControllerDataModule(pl.LightningDataModule):
             num_workers: int = 4,
             train_size: float = 0.8,
             points_count: int = 271,
-            extraction_points_count: int = 20):
+            extraction_points_count: int = 20,
+            model_type: str = None):
         super().__init__()
 
         self._data_path = Path(data_path)
@@ -42,21 +43,24 @@ class ControllerDataModule(pl.LightningDataModule):
             train_df,
             race_track_df,
             self._points_count,
-            self._extraction_points_count
+            self._extraction_points_count,
+            model_type=model_type,
         )
 
         self.val_dataset = ControllerDataset(
             val_df,
             race_track_df,
             self._points_count,
-            self._extraction_points_count
+            self._extraction_points_count,
+            model_type=model_type,
         )
 
         self.test_dataset = ControllerDataset(
             test_df,
             race_track_df,
             self._points_count,
-            self._extraction_points_count
+            self._extraction_points_count,
+            model_type=model_type,
         )
 
         self.n_features = self.train_dataset.n_features
