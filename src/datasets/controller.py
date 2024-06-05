@@ -21,13 +21,13 @@ class ControllerDataset(Dataset):
         self._df = df
         self._points_df = points_df
         self._target_columns = ResourceManager.get_targets_column_names()
-        self._pos_columns = ResourceManager.get_position_column_names()
+        self._pos_columns = ResourceManager.get_position_column_names_short()
         self._extraction_points_count = extraction_points_count
         self._points_count = points_count
         self._model_type = model_type
 
         columns_selected, _ = PandasHelpers.select_columns_with_patter(
-            self._points_df, ResourceManager.get_regex_point_position_patterns())
+            self._points_df, ResourceManager.get_regex_point_position_patterns_short())
         self._point_pos_cols = columns_selected
         self._points_training_cols = columns_selected
         self._feature_columns = self._pos_columns + columns_selected

@@ -46,8 +46,8 @@ def train(args):
     model = ControllerModel(
         module_config={
             "lr": 1.5e-3,
-            "lr_patience": 8,
-            "lr_factor": 0.8,
+            "lr_patience": 3,
+            "lr_factor": 0.5,
             "extraction_points_count": args.extraction_points_count,
         },
         network_config={
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     parser.add_argument('-ep', '--extraction-points-count', action='store', default=10,
                         type=int, help='Specified count of points from trajectory to be used')
     parser.add_argument('-dn', '--dense-neurons', action='store', default=512, type=int)
-    parser.add_argument('-p', '--patience', action='store', default=20,
+    parser.add_argument('-p', '--patience', action='store', default=10,
                         type=int, help='Specified count of points from trajectory')
 
     args_parsed = parser.parse_args()
