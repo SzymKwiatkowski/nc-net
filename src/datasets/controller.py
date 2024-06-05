@@ -7,14 +7,15 @@ from utils.pandas_helpers import PandasHelpers
 from utils.resource_manager import ResourceManager
 
 
-# pylint: disable=R0902
+# pylint: disable=R0902, R0913
 class ControllerDataset(Dataset):
     """Class implementing dataset for controller network."""
     def __init__(self,
                  df: pd.DataFrame,
                  points_df: pd.DataFrame,
                  points_count: int = 271,
-                 extraction_points_count: int = 20):
+                 extraction_points_count: int = 20,
+                 model_type: str = None):
         super().__init__()
 
         self._df = df
@@ -23,6 +24,7 @@ class ControllerDataset(Dataset):
         self._pos_columns = ResourceManager.get_position_column_names()
         self._extraction_points_count = extraction_points_count
         self._points_count = points_count
+        self._model_type = model_type
 
         columns_selected, _ = PandasHelpers.select_columns_with_patter(
             self._points_df, ResourceManager.get_regex_point_position_patterns())
@@ -50,8 +52,10 @@ class ControllerDataset(Dataset):
 
         x = torch.from_numpy(x)
         y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
-        x = x.unsqueeze(dim=0)
-        y = y.unsqueeze(dim=0)
+
+        if self._model_type != "RBF":
+            x = x.unsqueeze(dim=0)
+            y = y.unsqueeze(dim=0)
 
         return x.float(), y.float()
 

@@ -4,6 +4,9 @@ from lightning import pytorch as pl
 import torchmetrics
 from models.controller_model import ControllerNetworkModel
 
+from models.rbf.rbf_network import RbfNetwork
+from models.rbf.rbf import poisson_two
+
 
 # pylint: disable=W0221, R0902
 class ControllerModel(pl.LightningModule):
@@ -19,11 +22,27 @@ class ControllerModel(pl.LightningModule):
         self.extraction_points_count = module_config["extraction_points_count"]
         self.loss_function = torch.nn.MSELoss()
 
-        self.model = ControllerNetworkModel(
-            input_size=network_config["input_size"],
-            output_size=network_config["output_size"],
-            num_dense_neurons=network_config["num_dense_neurons"]
-        )
+        if network_config["type"] == "RBF":
+            self.model = RbfNetwork(
+                [
+                    network_config["input_size"],
+                    network_config["input_size"],
+                    network_config["input_size"],
+                    1
+                ],
+                [
+                    network_config["num_dense_neurons"],
+                    network_config["num_dense_neurons"],
+                    network_config["num_dense_neurons"] // 2]
+                ,
+                poisson_two
+            )
+        else:
+            self.model = ControllerNetworkModel(
+                input_size=network_config["input_size"],
+                output_size=network_config["output_size"],
+                num_dense_neurons=network_config["num_dense_neurons"]
+            )
 
         metrics = torchmetrics.MetricCollection([
             torchmetrics.MeanAbsoluteError(),

@@ -22,6 +22,7 @@ def train(args):
     config = load_config(args.config)
     token = config['config']['NEPTUNE_API_TOKEN']
     project = config['config']['NEPTUNE_PROJECT']
+    model_type = None
 
     if args.use_neptune:
         logger = NeptuneLogger(
@@ -39,12 +40,13 @@ def train(args):
         train_size=0.8,
         points_count=args.points_count,
         extraction_points_count=args.extraction_points_count,
+        model_type=model_type,
     )
 
     model = ControllerModel(
         module_config={
             "lr": 1.5e-3,
-            "lr_patience": 5,
+            "lr_patience": 8,
             "lr_factor": 0.8,
             "extraction_points_count": args.extraction_points_count,
         },
@@ -52,6 +54,7 @@ def train(args):
             'input_size': datamodule.n_features,
             'output_size': datamodule.n_targets,
             'num_dense_neurons': args.dense_neurons,
+            'type': model_type,
         }
     )
 
