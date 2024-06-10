@@ -4,6 +4,7 @@ from lightning import pytorch as pl
 import torchmetrics
 from models.controller_model import ControllerNetworkModel
 from models.controller_sc_model import ControllerScNetworkModel
+from models.dense_rbf import DenseRBF
 from models.rbf.rbf_network import RbfNetwork
 from models.rbf.rbf import poisson_two
 
@@ -13,14 +14,23 @@ class ControllerModel(pl.LightningModule):
     """Class for lightning module for controller"""
     def __init__(self,
                  module_config: dict,
-                 network_config: dict):
+                 network_config: dict,
+                 **kwargs):
         super().__init__()
 
         self.lr = module_config["lr"]
         self.lr_factor = module_config["lr_factor"]
         self.lr_patience = module_config["lr_patience"]
         self.extraction_points_count = module_config["extraction_points_count"]
-        self.loss_function = torch.nn.MSELoss()
+
+        if module_config['loss'] == "MSE":
+            self.loss_function = torch.nn.MSELoss()
+        elif module_config['loss'] == "L1":
+            self.loss_function = torch.nn.L1Loss()
+        elif module_config['loss'] == "huber":
+            self.loss_function = torch.nn.HuberLoss()
+        else:
+            self.loss_function = torch.nn.MSELoss()
 
         if network_config["type"] == "RBF":
             self.model = RbfNetwork(
@@ -39,6 +49,12 @@ class ControllerModel(pl.LightningModule):
             )
         elif network_config["type"] == "skip_connection":
             self.model = ControllerScNetworkModel(
+                input_size=network_config["input_size"],
+                output_size=network_config["output_size"],
+                num_dense_neurons=network_config["num_dense_neurons"]
+            )
+        elif network_config["type"] == "DenseRBF":
+            self.model = DenseRBF(
                 input_size=network_config["input_size"],
                 output_size=network_config["output_size"],
                 num_dense_neurons=network_config["num_dense_neurons"]
@@ -97,8 +113,8 @@ class ControllerModel(pl.LightningModule):
         self.log_dict(self.test_metrics)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.997), eps=1e-7,
-                                      lr=self.lr, weight_decay=8e-3, amsgrad=True)
+        optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.999), eps=1e-8,
+                                      lr=self.lr, weight_decay=1e-2, amsgrad=False)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.lr_patience,
                                                                factor=self.lr_factor)
 

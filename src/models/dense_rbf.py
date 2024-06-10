@@ -1,11 +1,12 @@
-"""Implementation of network for controller model."""
+"""Network model for dense RBF network."""
 import torch
 from torch import nn
 
+from models.rbf.rbf_network import RbfNetwork
+from models.rbf.rbf import poisson_two
 
-# pylint: disable=R0902
-class ControllerNetworkModel(nn.Module):
-    """Class implementing network for controller model."""
+
+class DenseRBF(nn.Module):
     def __init__(self, input_size: int, output_size: int, num_dense_neurons=512):
         super().__init__()
 
@@ -14,12 +15,23 @@ class ControllerNetworkModel(nn.Module):
         self._num_dense_neurons = num_dense_neurons
 
         self._lin1 = nn.Linear(self._input_size, self._num_dense_neurons)
-        self.lin_dense = nn.Linear(self._num_dense_neurons, self._num_dense_neurons)
         self._lin2 = nn.Linear(self._num_dense_neurons, self._num_dense_neurons // 2)
-        self._lin3 = nn.Linear(self._num_dense_neurons // 2, self._num_dense_neurons // 2)
-        self._lin_out = nn.Linear(self._num_dense_neurons // 2, self._output_size)
         self._activation = nn.Tanh()
         self._dropout = nn.Dropout(0.5)
+        self.rbf_layers = RbfNetwork(
+                [
+                    self._num_dense_neurons // 2,
+                    self._num_dense_neurons // 2,
+                    self._num_dense_neurons // 2,
+                    1,
+                ],
+                [
+                    self._num_dense_neurons,
+                    self._num_dense_neurons // 4,
+                    self._num_dense_neurons // 2]
+                ,
+                poisson_two
+            )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -31,26 +43,13 @@ class ControllerNetworkModel(nn.Module):
         x = self._activation(x)
         x = self._dropout(x)
 
-        x = self.lin_dense(x)
-        x = self._activation(x)
-        x = self._dropout(x)
-
-        x = self.lin_dense(x)
-        x = self._activation(x)
-        x = self._dropout(x)
-
         x = self._lin2(x)
         x = self._activation(x)
         x = self._dropout(x)
 
-        x = self._lin3(x)
-        x = self._activation(x)
-        x = self._dropout(x)
+        x = torch.squeeze(x, dim=0)
+        x = torch.squeeze(x, dim=0)
 
-        x = self._lin3(x)
-        x = self._activation(x)
-        x = self._dropout(x)
-
-        x = self._lin_out(x)
+        x = self.rbf_layers(x)
 
         return x

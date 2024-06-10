@@ -26,9 +26,10 @@ def train(args):
     Expected model types are:
     - RBF
     - skip_connection
-    - None
+    - DenseRBF
+    - None, which is default bare fully connected network
     """
-    model_type = "skip_connection"
+    model_type = None
 
     if args.use_neptune:
         logger = NeptuneLogger(
@@ -41,7 +42,7 @@ def train(args):
 
     datamodule = ControllerDataModule(
         data_path=Path(data_dir),
-        batch_size=32,
+        batch_size=64,
         num_workers=4,
         model_type=model_type,
     )
@@ -49,9 +50,10 @@ def train(args):
     model = ControllerModel(
         module_config={
             "lr": 1.5e-3,
-            "lr_patience": 3,
-            "lr_factor": 0.65,
+            "lr_patience": 2,
+            "lr_factor": 0.75,
             "extraction_points_count": args.extraction_points_count,
+            "loss": "MSE"
         },
         network_config={
             'input_size': datamodule.n_features,

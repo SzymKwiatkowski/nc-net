@@ -4,5 +4,11 @@
     "points_df": "points_df.csv",
     "points_count": 271,
     "train_size": 0.75
+  },
+  {
+    "main_df": "trajectory2_data.csv",
+    "points_df": "trajectory2_race_track.csv",
+    "points_count": 280,
+    "train_size": 0.75
   }
 ]
