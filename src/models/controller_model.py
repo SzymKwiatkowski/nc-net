@@ -3,7 +3,7 @@ import torch
 from torch import nn
 
 
-# pylint: disable=R0902
+# pylint: disable=R0902, R0801
 class ControllerNetworkModel(nn.Module):
     """Class implementing network for controller model."""
     def __init__(self, input_size: int, output_size: int, num_dense_neurons=512):

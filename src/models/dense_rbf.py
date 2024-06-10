@@ -6,7 +6,9 @@ from models.rbf.rbf_network import RbfNetwork
 from models.rbf.rbf import poisson_two
 
 
+# pylint: disable=R0902, R0801
 class DenseRBF(nn.Module):
+    """Network model for dense RBF network."""
     def __init__(self, input_size: int, output_size: int, num_dense_neurons=512):
         super().__init__()
 

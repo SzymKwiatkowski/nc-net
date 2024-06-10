@@ -11,6 +11,7 @@ from models.model import ControllerModel
 from utils.helpers import load_config
 
 
+# pylint: disable=W0105
 def train(args):
     """
     :param args: parsed arguments
