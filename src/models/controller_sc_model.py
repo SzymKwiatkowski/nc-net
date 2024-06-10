@@ -4,7 +4,7 @@ from torch import nn
 
 
 # pylint: disable=R0902
-class ControllerNetworkModel(nn.Module):
+class ControllerScNetworkModel(nn.Module):
     """Class implementing network for controller model."""
     def __init__(self, input_size: int, output_size: int, num_dense_neurons=512):
         super().__init__()
@@ -30,7 +30,7 @@ class ControllerNetworkModel(nn.Module):
         x = self._activation(x)
         x = self._dropout(x)
 
-        x1, x2 = torch.split(x, self._num_dense_neurons, dim=1)
+        x1, x2 = torch.split(x, [self._num_dense_neurons // 2, self._num_dense_neurons // 2], dim=2)
 
         x1 = self._lin2(x1)
         x1 = self._activation(x1)
@@ -40,7 +40,7 @@ class ControllerNetworkModel(nn.Module):
         x2 = self._activation(x2)
         x2 = self._dropout(x2)
 
-        x_cat = torch.cat((x1, x2), dim=1)
+        x_cat = torch.cat((x1, x2), dim=2)
 
         x = torch.add(x, x_cat)
         x = self._activation(x)

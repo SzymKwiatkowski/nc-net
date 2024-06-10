@@ -1,9 +1,8 @@
 """Datamodule for managing dataset data and workers during training"""
 from pathlib import Path
 from typing import Optional
-
-import pandas as pd
 import json
+import pandas as pd
 from lightning import pytorch as pl
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data import ConcatDataset
@@ -37,11 +36,8 @@ class ControllerDataModule(pl.LightningDataModule):
         self.n_targets = len(self._target_columns)
         self.n_features = len(self._point_poses_columns) * (extraction_points_count + 1)
 
-        configs = open(self._data_path / "datasets.json")
-        configs = json.load(configs)
-        dataset_configs = [DatasetConfig(config) for config in configs]
-
-        self.train_dataset, self.test_dataset, self.val_dataset = self.prepare_datasets(dataset_configs)
+        self.train_dataset, self.test_dataset, self.val_dataset = self.prepare_datasets(
+            self.get_configs(self._data_path / "datasets.json"))
 
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
 
@@ -110,11 +106,12 @@ class ControllerDataModule(pl.LightningDataModule):
 
         return ConcatDataset(train_datasets), ConcatDataset(val_datasets), ConcatDataset(test_datasets)
 
-    def get_configs(self, config_path: Path) -> list[DatasetConfig]:
+    @staticmethod
+    def get_configs(config_path: Path) -> list[DatasetConfig]:
         """
         Returns configs loaded from config file
         :param config_path: path to config file
         """
-        configs = open(config_path)
-        configs = json.load(configs)
+        with open(config_path, encoding='utf-8') as configs:
+            configs = json.load(configs)
         return [DatasetConfig(config) for config in configs]

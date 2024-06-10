@@ -4,7 +4,6 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 from utils.pandas_helpers import PandasHelpers
-from utils.resource_manager import ResourceManager
 
 
 # pylint: disable=R0902, R0913

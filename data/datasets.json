@@ -3,6 +3,6 @@
     "main_df": "main_df.csv",
     "points_df": "points_df.csv",
     "points_count": 271,
-    "train_size": 0.7
+    "train_size": 0.75
   }
 ]

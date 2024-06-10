@@ -22,7 +22,13 @@ def train(args):
     config = load_config(args.config)
     token = config['config']['NEPTUNE_API_TOKEN']
     project = config['config']['NEPTUNE_PROJECT']
-    model_type = "RBF"
+    """
+    Expected model types are:
+    - RBF
+    - skip_connection
+    - None
+    """
+    model_type = "skip_connection"
 
     if args.use_neptune:
         logger = NeptuneLogger(
@@ -44,7 +50,7 @@ def train(args):
         module_config={
             "lr": 1.5e-3,
             "lr_patience": 3,
-            "lr_factor": 0.5,
+            "lr_factor": 0.65,
             "extraction_points_count": args.extraction_points_count,
         },
         network_config={
