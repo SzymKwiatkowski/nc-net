@@ -3,11 +3,15 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
+import json
 from lightning import pytorch as pl
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import ConcatDataset
 
 from datamodules.dataset_split import basic_split
 from datasets.controller import ControllerDataset
+from datasets.dataset_config import DatasetConfig
+from utils.resource_manager import ResourceManager
 
 
 # pylint: disable=R0913, R0902
@@ -17,54 +21,28 @@ class ControllerDataModule(pl.LightningDataModule):
             self,
             data_path: Path,
             batch_size: int = 32,
+            extraction_points_count: int = 10,
             num_workers: int = 4,
-            train_size: float = 0.8,
-            points_count: int = 271,
-            extraction_points_count: int = 20,
             model_type: str = None):
         super().__init__()
 
         self._data_path = Path(data_path)
         self._batch_size = batch_size
         self._num_workers = num_workers
-        self._train_size = train_size
-        self._points_count = points_count
         self._extraction_points_count = extraction_points_count
+        self._target_columns = ResourceManager.get_targets_column_names()
+        self._pos_columns = ResourceManager.get_position_column_names_short()
+        self._point_poses_columns = ResourceManager.get_regex_point_position_patterns_short()
+        self.model_type = model_type
+        self.n_targets = len(self._target_columns)
+        self.n_features = len(self._point_poses_columns) * (extraction_points_count + 1)
 
-        self.train_dataset = None
-        self.test_dataset = None
-        self.val_dataset = None
+        configs = open(self._data_path / "datasets.json")
+        configs = json.load(configs)
+        dataset_configs = [DatasetConfig(config) for config in configs]
 
-        df = pd.read_csv(self._data_path / "main_df.csv")
-        race_track_df = pd.read_csv(self._data_path / "points_df.csv")
-        train_df, val_df, test_df = basic_split(df, self._train_size)
+        self.train_dataset, self.test_dataset, self.val_dataset = self.prepare_datasets(dataset_configs)
 
-        self.train_dataset = ControllerDataset(
-            train_df,
-            race_track_df,
-            self._points_count,
-            self._extraction_points_count,
-            model_type=model_type,
-        )
-
-        self.val_dataset = ControllerDataset(
-            val_df,
-            race_track_df,
-            self._points_count,
-            self._extraction_points_count,
-            model_type=model_type,
-        )
-
-        self.test_dataset = ControllerDataset(
-            test_df,
-            race_track_df,
-            self._points_count,
-            self._extraction_points_count,
-            model_type=model_type,
-        )
-
-        self.n_features = self.train_dataset.n_features
-        self.n_targets = self.train_dataset.n_targets
         self.save_hyperparameters(ignore=['data_path', 'number_of_workers'])
 
     def setup(self, stage: Optional[str] = None):
@@ -84,3 +62,59 @@ class ControllerDataModule(pl.LightningDataModule):
         return DataLoader(
             self.test_dataset, batch_size=self._batch_size, num_workers=self._num_workers,
         )
+
+    def prepare_datasets(self, dataset_configs: Optional[list[DatasetConfig]]) -> tuple[Dataset, Dataset, Dataset]:
+        """
+        Prepares dataset for each config
+        :param dataset_configs: list of dataset configs
+        """
+        train_datasets = []
+        val_datasets = []
+        test_datasets = []
+        for dataset_config in dataset_configs:
+            df = pd.read_csv(self._data_path / dataset_config.main_df)
+            race_track_df = pd.read_csv(self._data_path / dataset_config.points_df)
+            train_df, val_df, test_df = basic_split(df, dataset_config.train_size)
+            train_datasets.append(ControllerDataset(
+                train_df,
+                race_track_df,
+                pos_columns=self._pos_columns,
+                target_columns=self._target_columns,
+                point_poses_columns=self._point_poses_columns,
+                points_count=dataset_config.points_count,
+                extraction_points_count=self._extraction_points_count,
+                model_type=self.model_type,
+            ))
+
+            val_datasets.append(ControllerDataset(
+                val_df,
+                race_track_df,
+                pos_columns=self._pos_columns,
+                target_columns=self._target_columns,
+                point_poses_columns=self._point_poses_columns,
+                points_count=dataset_config.points_count,
+                extraction_points_count=self._extraction_points_count,
+                model_type=self.model_type,
+            ))
+
+            test_datasets.append(ControllerDataset(
+                test_df,
+                race_track_df,
+                pos_columns=self._pos_columns,
+                target_columns=self._target_columns,
+                point_poses_columns=self._point_poses_columns,
+                points_count=dataset_config.points_count,
+                extraction_points_count=self._extraction_points_count,
+                model_type=self.model_type,
+            ))
+
+        return ConcatDataset(train_datasets), ConcatDataset(val_datasets), ConcatDataset(test_datasets)
+
+    def get_configs(self, config_path: Path) -> list[DatasetConfig]:
+        """
+        Returns configs loaded from config file
+        :param config_path: path to config file
+        """
+        configs = open(config_path)
+        configs = json.load(configs)
+        return [DatasetConfig(config) for config in configs]

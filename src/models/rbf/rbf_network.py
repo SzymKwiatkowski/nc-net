@@ -7,7 +7,7 @@ from models.rbf import rbf
 class RbfNetwork(nn.Module):
     """RbfNetwork pytorch implementation."""
     def __init__(self, layer_widths, layer_centres, basis_func):
-        super(RbfNetwork).__init__()
+        super(RbfNetwork, self).__init__()
         self.rbf_layers = nn.ModuleList()
         self.linear_layers = nn.ModuleList()
         for i in range(len(layer_widths) - 1):

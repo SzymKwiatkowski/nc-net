@@ -22,7 +22,7 @@ def train(args):
     config = load_config(args.config)
     token = config['config']['NEPTUNE_API_TOKEN']
     project = config['config']['NEPTUNE_PROJECT']
-    model_type = None
+    model_type = "RBF"
 
     if args.use_neptune:
         logger = NeptuneLogger(
@@ -37,9 +37,6 @@ def train(args):
         data_path=Path(data_dir),
         batch_size=32,
         num_workers=4,
-        train_size=0.8,
-        points_count=args.points_count,
-        extraction_points_count=args.extraction_points_count,
         model_type=model_type,
     )
 
@@ -103,9 +100,6 @@ if __name__ == '__main__':
     # Max training epochs
     parser.add_argument('-e', '--epochs', action='store', default=70,
                         type=int, help='Specified number of maximum epochs')
-    # Amount of points desired to be used
-    parser.add_argument('-pc', '--points_count', action='store', default=271,
-                        type=int, help='Specified count of points from trajectory')
     parser.add_argument('-ep', '--extraction-points-count', action='store', default=10,
                         type=int, help='Specified count of points from trajectory to be used')
     parser.add_argument('-dn', '--dense-neurons', action='store', default=512, type=int)

@@ -2,7 +2,11 @@
 
 
 class ResourceManager:
-    """Class providing resources to other scripts"""
+    """
+    Class providing resources to other scripts
+    When using patterns for points extraction remember to only provide digit as regex pattern to not interfere in
+    features calculation for neural network: patterns_count x extraction_points
+    """
     @staticmethod
     def get_regex_point_position_patterns() -> list[str]:
         """
