@@ -4,7 +4,6 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 from utils.pandas_helpers import PandasHelpers
-from utils.resource_manager import ResourceManager
 
 
 # pylint: disable=R0902, R0913
@@ -13,21 +12,25 @@ class ControllerDataset(Dataset):
     def __init__(self,
                  df: pd.DataFrame,
                  points_df: pd.DataFrame,
+                 target_columns: list['str'],
+                 pos_columns: list['str'],
+                 point_poses_columns: list['str'],
                  points_count: int = 271,
-                 extraction_points_count: int = 20,
+                 extraction_points_count: int = 10,
                  model_type: str = None):
         super().__init__()
 
         self._df = df
         self._points_df = points_df
-        self._target_columns = ResourceManager.get_targets_column_names()
-        self._pos_columns = ResourceManager.get_position_column_names_short()
+        self._target_columns = target_columns
+        self._pos_columns = pos_columns
+        self._point_poses_columns = point_poses_columns
         self._extraction_points_count = extraction_points_count
         self._points_count = points_count
         self._model_type = model_type
 
         columns_selected, _ = PandasHelpers.select_columns_with_patter(
-            self._points_df, ResourceManager.get_regex_point_position_patterns_short())
+            self._points_df, self._point_poses_columns)
         self._point_pos_cols = columns_selected
         self._points_training_cols = columns_selected
         self._feature_columns = self._pos_columns + columns_selected
@@ -53,9 +56,9 @@ class ControllerDataset(Dataset):
         x = torch.from_numpy(x)
         y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
 
-        if self._model_type != "RBF":
-            x = x.unsqueeze(dim=0)
-            y = y.unsqueeze(dim=0)
+        # if self._model_type != "RBF":
+        #     x = x.unsqueeze(dim=0)
+        #     y = y.unsqueeze(dim=0)
 
         return x.float(), y.float()
 

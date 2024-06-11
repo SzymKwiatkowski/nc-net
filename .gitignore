@@ -10,7 +10,10 @@ config.yaml
 logs/
 
 # dataset
-data/
+data/**
+!data/datasets.json
+!data/main_df_sample.csv
+!data/points_df.csv
 
 # Neptune
 .neptune/

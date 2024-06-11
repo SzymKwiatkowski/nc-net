@@ -11,6 +11,7 @@ from models.model import ControllerModel
 from utils.helpers import load_config
 
 
+# pylint: disable=W0105
 def train(args):
     """
     :param args: parsed arguments
@@ -22,6 +23,13 @@ def train(args):
     config = load_config(args.config)
     token = config['config']['NEPTUNE_API_TOKEN']
     project = config['config']['NEPTUNE_PROJECT']
+    """
+    Expected model types are:
+    - RBF
+    - skip_connection
+    - DenseRBF
+    - None, which is default bare fully connected network
+    """
     model_type = None
 
     if args.use_neptune:
@@ -35,20 +43,18 @@ def train(args):
 
     datamodule = ControllerDataModule(
         data_path=Path(data_dir),
-        batch_size=32,
+        batch_size=64,
         num_workers=4,
-        train_size=0.8,
-        points_count=args.points_count,
-        extraction_points_count=args.extraction_points_count,
         model_type=model_type,
     )
 
     model = ControllerModel(
         module_config={
-            "lr": 1.5e-3,
-            "lr_patience": 3,
-            "lr_factor": 0.5,
+            "lr": 1.1e-3,
+            "lr_patience": 4,
+            "lr_factor": 0.75,
             "extraction_points_count": args.extraction_points_count,
+            "loss": "MSE"
         },
         network_config={
             'input_size': datamodule.n_features,
@@ -78,7 +84,8 @@ def train(args):
         logger=logger,
         callbacks=[model_summary_callback, checkpoint_callback, early_stop_callback, lr_monitor],
         accelerator='cuda',
-        max_epochs=args.epochs
+        max_epochs=args.epochs,
+        limit_train_batches=690,
     )
 
     trainer.fit(model=model, train_dataloaders=datamodule.train_dataloader(),
@@ -103,9 +110,6 @@ if __name__ == '__main__':
     # Max training epochs
     parser.add_argument('-e', '--epochs', action='store', default=70,
                         type=int, help='Specified number of maximum epochs')
-    # Amount of points desired to be used
-    parser.add_argument('-pc', '--points_count', action='store', default=271,
-                        type=int, help='Specified count of points from trajectory')
     parser.add_argument('-ep', '--extraction-points-count', action='store', default=10,
                         type=int, help='Specified count of points from trajectory to be used')
     parser.add_argument('-dn', '--dense-neurons', action='store', default=512, type=int)

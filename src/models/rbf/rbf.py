@@ -30,7 +30,8 @@ class RBF(nn.Module):
     """
 
     def __init__(self, in_features, out_features, basis_func):
-        super(RBF).__init__()
+        # pylint: disable=R1725
+        super(RBF, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.centres = nn.Parameter(torch.Tensor(out_features, in_features))
