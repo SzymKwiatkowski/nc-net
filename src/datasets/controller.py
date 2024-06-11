@@ -28,6 +28,7 @@ class ControllerDataset(Dataset):
         self._extraction_points_count = extraction_points_count
         self._points_count = points_count
         self._model_type = model_type
+        self._max_y = 0.523599
 
         columns_selected, _ = PandasHelpers.select_columns_with_patter(
             self._points_df, self._point_poses_columns)
@@ -54,11 +55,7 @@ class ControllerDataset(Dataset):
         x = np.concatenate([position.T.flatten(), extracted_points])
 
         x = torch.from_numpy(x)
-        y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
-
-        # if self._model_type != "RBF":
-        #     x = x.unsqueeze(dim=0)
-        #     y = y.unsqueeze(dim=0)
+        y = (torch.from_numpy((self._df[self._target_columns].iloc[row].to_numpy() + self._max_y) / (2 * self._max_y)))
 
         return x.float(), y.float()
 
