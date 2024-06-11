@@ -50,8 +50,8 @@ def train(args):
 
     model = ControllerModel(
         module_config={
-            "lr": 1.5e-3,
-            "lr_patience": 2,
+            "lr": 1.1e-3,
+            "lr_patience": 4,
             "lr_factor": 0.75,
             "extraction_points_count": args.extraction_points_count,
             "loss": "MSE"
@@ -84,7 +84,8 @@ def train(args):
         logger=logger,
         callbacks=[model_summary_callback, checkpoint_callback, early_stop_callback, lr_monitor],
         accelerator='cuda',
-        max_epochs=args.epochs
+        max_epochs=args.epochs,
+        limit_train_batches=690,
     )
 
     trainer.fit(model=model, train_dataloaders=datamodule.train_dataloader(),

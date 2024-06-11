@@ -3,7 +3,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-@staticmethod
 def basic_split(df: pd.DataFrame, train_size: float) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     :param df: dataframe containing data to be split.

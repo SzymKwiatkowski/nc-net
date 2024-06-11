@@ -6,7 +6,7 @@ from models.controller_model import ControllerNetworkModel
 from models.controller_sc_model import ControllerScNetworkModel
 from models.dense_rbf import DenseRBF
 from models.rbf.rbf_network import RbfNetwork
-from models.rbf.rbf import poisson_two
+from models.rbf.rbf import linear
 
 
 # pylint: disable=W0221, R0902
@@ -45,7 +45,7 @@ class ControllerModel(pl.LightningModule):
                     network_config["num_dense_neurons"],
                     network_config["num_dense_neurons"] // 2]
                 ,
-                poisson_two
+                linear
             )
         elif network_config["type"] == "skip_connection":
             self.model = ControllerScNetworkModel(
@@ -69,7 +69,7 @@ class ControllerModel(pl.LightningModule):
         metrics = torchmetrics.MetricCollection([
             torchmetrics.MeanAbsoluteError(),
             torchmetrics.MeanAbsolutePercentageError(),
-            torchmetrics.MeanSquaredError(),
+            torchmetrics.MeanSquaredError()
         ])
 
         self.train_metrics = metrics.clone('train_')
@@ -114,7 +114,9 @@ class ControllerModel(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), betas=(0.91, 0.999), eps=1e-8,
-                                      lr=self.lr, weight_decay=1e-2, amsgrad=False)
+                                      lr=self.lr, weight_decay=1e-2)
+        # optimizer = torch.optim.ASGD(self.parameters(), lr=self.lr, weight_decay=1e-2, lambd=0.0001, alpha=0.75)
+
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.lr_patience,
                                                                factor=self.lr_factor)
 

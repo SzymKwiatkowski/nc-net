@@ -4,8 +4,7 @@ from typing import Optional
 import json
 import pandas as pd
 from lightning import pytorch as pl
-from torch.utils.data import DataLoader, Dataset
-from torch.utils.data import ConcatDataset
+from torch.utils.data import DataLoader, Dataset, ConcatDataset
 
 from datamodules.dataset_split import basic_split
 from datasets.controller import ControllerDataset

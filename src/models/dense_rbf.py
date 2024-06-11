@@ -18,14 +18,14 @@ class DenseRBF(nn.Module):
 
         self._lin1 = nn.Linear(self._input_size, self._num_dense_neurons)
         self._lin2 = nn.Linear(self._num_dense_neurons, self._num_dense_neurons // 2)
-        self._activation = nn.Tanh()
+        self._softmax = nn.Softmax(dim=-1)
         self._dropout = nn.Dropout(0.5)
         self.rbf_layers = RbfNetwork(
                 [
                     self._num_dense_neurons // 2,
                     self._num_dense_neurons // 2,
                     self._num_dense_neurons // 2,
-                    1,
+                    1
                 ],
                 [
                     self._num_dense_neurons,
@@ -42,16 +42,20 @@ class DenseRBF(nn.Module):
         """
 
         x = self._lin1(x)
-        x = self._activation(x)
+        x = self._softmax(x)
+        # x = self._activation(x)
         x = self._dropout(x)
 
         x = self._lin2(x)
-        x = self._activation(x)
+        x = self._softmax(x)
+        # x = self._activation(x)
         x = self._dropout(x)
 
-        x = torch.squeeze(x, dim=0)
-        x = torch.squeeze(x, dim=0)
+        x = torch.squeeze(x, dim=1)
+        x = torch.squeeze(x, dim=1)
 
         x = self.rbf_layers(x)
+        # x = self._activation(x)
+        x = torch.unsqueeze(x, dim=1)
 
         return x

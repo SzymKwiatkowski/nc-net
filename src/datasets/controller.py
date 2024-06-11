@@ -56,9 +56,9 @@ class ControllerDataset(Dataset):
         x = torch.from_numpy(x)
         y = torch.from_numpy(self._df[self._target_columns].iloc[row].to_numpy())
 
-        if self._model_type != "RBF":
-            x = x.unsqueeze(dim=0)
-            y = y.unsqueeze(dim=0)
+        # if self._model_type != "RBF":
+        #     x = x.unsqueeze(dim=0)
+        #     y = y.unsqueeze(dim=0)
 
         return x.float(), y.float()
 

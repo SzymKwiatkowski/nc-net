@@ -5,6 +5,7 @@ import onnx
 
 from models.model import ControllerModel
 from utils.model_utils import export_onnx, measure_latency, get_size
+from utils.resource_manager import ResourceManager
 
 
 # pylint: disable=E1120
@@ -20,7 +21,7 @@ def export_model(args) -> None:
     input_size = args.input_size
     assessment = args.assessment
     if input_size == 0 or input_size is None:
-        input_size = (extraction_points+1) * 7
+        input_size = (extraction_points+1) * len(ResourceManager.get_regex_point_position_patterns_short())
 
     export_onnx(torch_model, input_size=input_size, onnx_model_name=onnx_export_name)
 
@@ -39,7 +40,6 @@ if __name__ == '__main__':
         epilog='')
     parser.add_argument('-m', '--model-path', action='store', default='torch_model.pth')
     parser.add_argument('-n', '--export-name', action='store', default='model.onnx')
-    parser.add_argument('-d', '--data-path', action='store', default='../data/sample_data.csv')
     parser.add_argument('-ep', '--extraction-points-count', action='store', default=10,
                         type=int, help='Specified count of points from trajectory to be used')
     parser.add_argument('-ip', '--input-size', action='store', type=int,

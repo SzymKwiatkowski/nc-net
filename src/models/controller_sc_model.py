@@ -21,7 +21,7 @@ class ControllerScNetworkModel(nn.Module):
         self._lin3 = nn.Linear(self._num_dense_neurons, self._num_dense_neurons)
         self._lin4 = nn.Linear(self._num_dense_neurons, self._num_dense_neurons // 2)
         self._lin_out = nn.Linear(self._num_dense_neurons // 2, self._output_size)
-        self._activation = nn.Tanh()
+        self._activation = nn.ELU()
         self._dropout = nn.Dropout(0.5)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
