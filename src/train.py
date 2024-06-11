@@ -46,13 +46,14 @@ def train(args):
         batch_size=64,
         num_workers=4,
         model_type=model_type,
+        extraction_points_count=args.extraction_points_count,
     )
 
     model = ControllerModel(
         module_config={
             "lr": 1.1e-3,
-            "lr_patience": 4,
-            "lr_factor": 0.75,
+            "lr_patience": 3,
+            "lr_factor": 0.5,
             "extraction_points_count": args.extraction_points_count,
             "loss": "MSE"
         },
@@ -68,7 +69,7 @@ def train(args):
 
     model_summary_callback = pl.callbacks.ModelSummary(max_depth=-1)
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        filename='points-{extraction_points_count}-{epoch}-{val_MeanAbsoluteError:.5f}',
+        filename=f'points-{args.extraction_points_count}'+'-{epoch}-{val_MeanAbsoluteError:.5f}',
         mode='min',
         monitor='val_MeanAbsoluteError',
         verbose=True,
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     # Max training epochs
     parser.add_argument('-e', '--epochs', action='store', default=70,
                         type=int, help='Specified number of maximum epochs')
-    parser.add_argument('-ep', '--extraction-points-count', action='store', default=10,
+    parser.add_argument('-ep', '--extraction-points-count', action='store', default=6,
                         type=int, help='Specified count of points from trajectory to be used')
     parser.add_argument('-dn', '--dense-neurons', action='store', default=512, type=int)
     parser.add_argument('-p', '--patience', action='store', default=10,

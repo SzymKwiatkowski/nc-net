@@ -48,7 +48,7 @@ def measure_latency(model, input_size: int, dtype=torch.float32, iterations: int
     infer_times = []
 
     for __ in range(iterations):
-        input_data = torch.randn(1, 1, input_size, dtype=dtype, device=model.device)
+        input_data = torch.randn(1, input_size, dtype=dtype, device=model.device)
         inference_start = perf_counter()
         __ = model(input_data)
         inference_time = perf_counter() - inference_start
@@ -65,7 +65,7 @@ def export_onnx(model, input_size: int, dtype=torch.float32, onnx_model_name: st
     :param onnx_model_name: name of onnx model
     """
     model.eval()
-    input_data = torch.randn(1, 1, input_size, dtype=dtype, device=model.device)
+    input_data = torch.randn(1, input_size, dtype=dtype, device=model.device)
 
     torch.onnx.export(
         model,
