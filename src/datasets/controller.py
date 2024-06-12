@@ -29,7 +29,7 @@ class ControllerDataset(Dataset):
         self._extraction_points_count = extraction_points_count
         self._points_count = points_count
         self._model_type = model_type
-        self._max_y = 0.523599
+        self._max_y = max_y
 
         columns_selected, _ = PandasHelpers.select_columns_with_patter(
             self._points_df, self._point_poses_columns)
