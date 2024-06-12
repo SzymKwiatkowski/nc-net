@@ -17,7 +17,8 @@ class ControllerDataset(Dataset):
                  point_poses_columns: list['str'],
                  points_count: int = 271,
                  extraction_points_count: int = 10,
-                 model_type: str = None):
+                 model_type: str = None,
+                 max_y: float = 0.523599):
         super().__init__()
 
         self._df = df
